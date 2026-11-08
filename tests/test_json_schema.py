@@ -100,6 +100,23 @@ class TestCallJsonSchema:
         assert schema["properties"]["kwargs"]["required"] == []
         assert "description" not in schema
 
+    def test_no_positional_parameters_omit_prefix_items(self):
+        # draft 2020-12 requires `prefixItems` to be non-empty
+        def is_active(*, strict: bool = False) -> bool:
+            return True
+
+        def tagged(*tags: str) -> bool:
+            return True
+
+        assert call_json_schema("is_active", is_active)["properties"]["args"] == {
+            "type": "array",
+            "items": False,
+        }
+        assert call_json_schema("tagged", tagged)["properties"]["args"] == {
+            "type": "array",
+            "items": {"type": "string"},
+        }
+
     def test_required_keyword_only_parameter(self):
         def tagged(*, tag: str) -> bool:
             return True

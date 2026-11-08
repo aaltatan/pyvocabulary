@@ -108,7 +108,9 @@ class TestInjectedErrors:
 
         with pytest.raises(RuleDoesNotExistError, match="Available rules: one"):
             vocabulary["two"]
+
         with pytest.raises(RuleAlreadyRegisteredError):
             vocabulary.add("one", 1)
+
         with pytest.raises(TypeError, match="bad a-b"):
             vocabulary.add("a-b", 1)

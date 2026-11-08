@@ -141,8 +141,10 @@ def call_json_schema(
 
     def parameter_schema(parameter: Parameter) -> dict[str, Any]:
         schema = json_schema_of(annotations.get(parameter.name, Any))
+
         if parameter.default is not Parameter.empty and _is_json_value(parameter.default):
             schema["default"] = parameter.default
+
         return schema
 
     schema: dict[str, Any] = {
@@ -177,9 +179,11 @@ def _args_schema(
         (parameter for parameter in parameters if parameter.kind is Parameter.VAR_POSITIONAL),
         None,
     )
+    prefix_items = [parameter_schema(parameter) for parameter in positional]
     return {
         "type": "array",
-        "prefixItems": [parameter_schema(parameter) for parameter in positional],
+        # draft 2020-12 requires `prefixItems` to be non-empty, so it is left out when unused
+        **({"prefixItems": prefix_items} if prefix_items else {}),
         "items": parameter_schema(var_positional) if var_positional else False,
     }
 
@@ -207,8 +211,10 @@ def _kwargs_schema(
 
 def _enum_schema(values: list[Any]) -> dict[str, Any]:
     schema: dict[str, Any] = {"enum": values}
+
     if values and all(isinstance(value, str) for value in values):
         schema["type"] = "string"
+
     return schema
 
 
