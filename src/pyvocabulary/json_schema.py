@@ -177,9 +177,11 @@ def _args_schema(
         (parameter for parameter in parameters if parameter.kind is Parameter.VAR_POSITIONAL),
         None,
     )
+    prefix_items = [parameter_schema(parameter) for parameter in positional]
     return {
         "type": "array",
-        "prefixItems": [parameter_schema(parameter) for parameter in positional],
+        # draft 2020-12 requires `prefixItems` to be non-empty, so it is left out when unused
+        **({"prefixItems": prefix_items} if prefix_items else {}),
         "items": parameter_schema(var_positional) if var_positional else False,
     }
 
