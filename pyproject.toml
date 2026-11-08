@@ -1,6 +1,6 @@
 [project]
 name = "pyvocabulary"
-version = "0.1.1"
+version = "0.1.2"
 description = "The shared core of composable, JSON-definable building blocks: named registries, JSON Schemas from signatures and JSON-path errors."
 readme = "README.md"
 authors = [
