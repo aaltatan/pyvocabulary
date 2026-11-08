@@ -141,8 +141,10 @@ def call_json_schema(
 
     def parameter_schema(parameter: Parameter) -> dict[str, Any]:
         schema = json_schema_of(annotations.get(parameter.name, Any))
+
         if parameter.default is not Parameter.empty and _is_json_value(parameter.default):
             schema["default"] = parameter.default
+
         return schema
 
     schema: dict[str, Any] = {
@@ -209,8 +211,10 @@ def _kwargs_schema(
 
 def _enum_schema(values: list[Any]) -> dict[str, Any]:
     schema: dict[str, Any] = {"enum": values}
+
     if values and all(isinstance(value, str) for value in values):
         schema["type"] = "string"
+
     return schema
 
 

@@ -61,6 +61,7 @@ class TestPaths:
 
     def test_located_adds_a_note(self):
         error = KeyError("x")
+
         with pytest.raises(KeyError) as info, located("$[2]", KeyError):
             raise error
 
@@ -68,6 +69,7 @@ class TestPaths:
 
     def test_located_ignores_other_error_types(self):
         error = ValueError("x")
+
         with pytest.raises(ValueError, match="x") as info, located("$[2]", KeyError):
             raise error
 
@@ -87,6 +89,7 @@ class TestPaths:
     def test_located_keeps_unrelated_notes(self):
         error = KeyError("x")
         error.add_note("hint: check the spelling")
+
         with pytest.raises(KeyError) as info, located("$", KeyError):
             raise error
 
@@ -95,4 +98,5 @@ class TestPaths:
     def test_located_without_error_does_nothing(self):
         with located("$", KeyError):
             value = 1
+
         assert value == 1

@@ -64,10 +64,12 @@ def located(path: str, /, *errors: type[Exception]) -> Iterator[None]:
     except errors as error:
         notes = getattr(error, "__notes__", [])
         index = next((i for i, note in enumerate(notes) if note.startswith(_PREFIX)), None)
+
         if index is None:
             error.add_note(f"at {path}")
         else:
             notes[index] = f"at {path}{notes[index].removeprefix(_PREFIX)}"
+
         raise
 
 

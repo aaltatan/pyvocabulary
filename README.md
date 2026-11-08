@@ -425,18 +425,22 @@ A tiny compiler for `{"all": [call, ...]}` documents, built from every piece abo
 >>> def build(call: dict[str, Any]) -> Check:
 ...     factory = checks[call["name"]]
 ...     args, kwargs = call.get("args", []), call.get("kwargs", {})
+...
 ...     try:
 ...         signature(factory).bind(*args, **kwargs)
 ...     except TypeError as error:
 ...         message = f"{call['name']}: {bind_problem(error) or error}"
 ...         raise CheckArgumentError(message) from error
+...
 ...     return factory(*args, **kwargs)
 >>> def compile_all(document: dict[str, Any]) -> Check:
 ...     path = key_path("$", "all")
 ...     built = []
+...
 ...     for index, call in enumerate(document["all"]):
 ...         with located(index_path(path, index), LookupError, CheckError):
 ...             built.append(build(call))
+...
 ...     return lambda value: all(item(value) for item in built)
 >>> in_range = compile_all({"all": [{"name": "ge", "args": [1]}, {"name": "le", "args": [10]}]})
 >>> in_range(5), in_range(11)

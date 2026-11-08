@@ -91,6 +91,7 @@ class Vocabulary[F](Mapping[str, F]):
             raise self._already_registered(name)
 
         self._entries[name] = entry
+
         if hidden:
             self._hidden.add(name)
 
@@ -114,6 +115,7 @@ class Vocabulary[F](Mapping[str, F]):
     def __getitem__(self, name: str, /) -> F:
         if name not in self:
             raise self._does_not_exist(name, list(self))
+
         return self._entries[name]
 
     def get(self, name: str, default: F | None = None, /) -> F | None:  # type: ignore[override]
