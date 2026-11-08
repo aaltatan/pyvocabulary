@@ -20,9 +20,9 @@
 - [x] pyformula on pyvocabulary (branch `refactor/pyvocabulary`, 0.2.0: hidden variables no longer compilable)
 
 ## Phase 3 — Release
-- [ ] Create the GitHub repository `aaltatan/pyvocabulary` and push
-- [ ] CI: ruff, pyright, pytest on 3.12 and 3.13 with coverage
-- [ ] Confirm the PyPI name is free, publish 0.1.0
+- [x] Create the GitHub repository `aaltatan/pyvocabulary` and push
+- [x] CI: ruff, pyright, pytest on 3.12 and 3.13 with coverage (`.github/workflows/ci.yml`; runs on the next push)
+- [x] Confirm the PyPI name is free, publish 0.1.0 (wheel identical to `src/`)
 - [ ] Switch siblings from the git source to `pyvocabulary>=0.1.0` from PyPI and merge their PRs
 
 ## Later (only on a real need)
