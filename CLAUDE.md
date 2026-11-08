@@ -55,6 +55,12 @@ The package is `pyvocabulary` under `src/`, built with `uv_build`.
 ## Code style (non-negotiable)
 
 - Python 3.12+, PEP 695 generics (`class Ruleset[T, V]:`, `type Value[T, V] = Callable[[T], V]`).
+- Blank lines for readability: a blank line after each statement (or small group of
+  closely related lines), and always before a `return` and before and after every block
+  (`if`, `for`, `while`, `with`, `try`, `match`), unless it is the first line of its block.
+  This applies to README examples too.
+- README examples are plain Python scripts (results shown as `# ...` comments), not
+  `>>>` REPL sessions.
 - Simplest thing that works. No abstraction until a second real use exists.
 - Functions first; a class only when it holds state or gives a nicer API (composable operators).
 - Pure core, side effects at the edges. Composition over inheritance. No ABCs; use `Protocol`.
