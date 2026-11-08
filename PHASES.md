@@ -17,7 +17,7 @@
 - [x] pyspecification on pyvocabulary (branch `refactor/pyvocabulary`)
 - [x] pyflowstep on pyvocabulary (branch `refactor/pyvocabulary`)
 - [x] pyruleset uses `located`, `index_path`, `key_path`
-- [ ] pyformula: decide whether it may depend on pyvocabulary (it has no pyargprocessors dependency today)
+- [x] pyformula on pyvocabulary (branch `refactor/pyvocabulary`, 0.2.0: hidden variables no longer compilable)
 
 ## Phase 3 — Release
 - [ ] Create the GitHub repository `aaltatan/pyvocabulary` and push
