@@ -25,5 +25,11 @@
 - [x] Confirm the PyPI name is free, publish 0.1.0 (wheel identical to `src/`)
 - [x] Switch siblings to `pyvocabulary>=0.1.0` from PyPI (merged into their `main` locally, not pushed)
 
+## Phase 4 — Labels for editors (rulify)
+- [x] `Text` (a string or a `{language: text}` map), `labelled`, `Label` and `Choices` markers
+- [x] `call_json_schema(label=)`; `Vocabulary.add(label=)` and `Vocabulary.labels`
+- [x] 101 tests, 100% branch coverage; bumped to 0.2.0 (branch `feat/labels`, not published)
+- [ ] Publish 0.2.0; siblings then require `pyvocabulary>=0.2.0`
+
 ## Later (only on a real need)
 - [ ] Helpers for embedding one package's JSON Schema inside another's (`$id` per embedded schema)

@@ -13,6 +13,7 @@ from .exceptions import (
     PyvocabularyError,
 )
 from .json_schema import JSON_SCHEMA_DIALECT, call_json_schema, json_schema_of
+from .labels import Choices, Label, Text, labelled
 from .names import validate_name
 from .paths import index_path, key_path, located
 from .vocabulary import Vocabulary
@@ -20,16 +21,20 @@ from .vocabulary import Vocabulary
 __all__ = [
     "JSON_SCHEMA_DIALECT",
     "BindProblem",
+    "Choices",
     "InvalidNameError",
+    "Label",
     "NameAlreadyRegisteredError",
     "NameDoesNotExistError",
     "PyvocabularyError",
+    "Text",
     "Vocabulary",
     "bind_problem",
     "call_json_schema",
     "index_path",
     "json_schema_of",
     "key_path",
+    "labelled",
     "located",
     "validate_name",
 ]

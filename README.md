@@ -408,6 +408,55 @@ document = {
 print([call["properties"]["name"]["const"] for call in document["oneOf"]])  # ['age__between']
 ```
 
+### Labels and choices
+
+Editors built on these schemas show people words, not names. A label is a string for
+every language, or a `{language: text}` map. `Label` and `Choices` are `Annotated`
+markers on arguments; `label=` labels a whole call or a vocabulary entry. They land in
+the schema as `x-label`, `x-description` and `x-choices`, which validators ignore.
+
+```python
+from typing import Annotated
+
+from pyvocabulary import Choices, Label, labelled
+
+Tier = Annotated[str, Choices({"gold": {"en": "Gold", "ar": "ذهبي"}, "silver": "Silver"})]
+
+
+def tier__eq(value: Tier) -> bool:
+    """Whether the customer is in a tier."""
+    return True
+
+
+def age__ge(minimum: Annotated[int, Label({"en": "Minimum age", "ar": "أدنى عمر"})]) -> bool:
+    return True
+
+
+schema = call_json_schema("tier__eq", tier__eq, label={"en": "Tier is", "ar": "الفئة هي"})
+
+print(schema["x-label"])  # {'en': 'Tier is', 'ar': 'الفئة هي'}
+
+print(schema["properties"]["args"]["prefixItems"][0])
+# {'type': 'string', 'enum': ['gold', 'silver'], 'x-choices': [{'value': 'gold', 'label': {'en': 'Gold', 'ar': 'ذهبي'}}, {'value': 'silver', 'label': 'Silver'}]}
+
+print(call_json_schema("age__ge", age__ge)["properties"]["args"]["prefixItems"][0]["x-label"])
+# {'en': 'Minimum age', 'ar': 'أدنى عمر'}
+
+print(labelled({"type": "number"}, label="Salary", description="Before tax"))
+# {'type': 'number', 'x-label': 'Salary', 'x-description': 'Before tax'}
+```
+
+A vocabulary keeps labels too, for its visible entries:
+
+```python
+labelled_rules = Vocabulary[Callable[..., bool]]("rule")
+
+labelled_rules.add("age__ge", age__ge, label={"en": "Age at least", "ar": "العمر لا يقل عن"})
+labelled_rules.add("internal", lambda: True, hidden=True, label="Internal")
+
+print(labelled_rules.labels)  # {'age__ge': {'en': 'Age at least', 'ar': 'العمر لا يقل عن'}}
+```
+
 ## JSON-path errors
 
 Compilers walk nested JSON definitions. An error deep inside should say where it
@@ -539,13 +588,18 @@ print([call_json_schema(name, factory)["description"] for name, factory in check
 | Name | Kind | Summary |
 | --- | --- | --- |
 | `Vocabulary[F](kind="name", /, *, does_not_exist=None, already_registered=None, invalid_name=None)` | class | Read-only `Mapping[str, F]` of visible names |
-| `Vocabulary.add(name, entry, /, *, hidden=False) -> F` | method | Register and return `entry` |
+| `Vocabulary.add(name, entry, /, *, hidden=False, label=None) -> F` | method | Register and return `entry` |
+| `Vocabulary.labels -> dict[str, Text]` | property | Labels of the visible entries that have one |
 | `Vocabulary.is_registered(name, /) -> bool` | method | Whether the name is taken, hidden or not |
 | `validate_name(name, /, *, kind="name", error=None) -> str` | function | Return the name if it is an ASCII identifier, else raise |
 | `bind_problem(error, /) -> BindProblem \| None` | function | Classify a `Signature.bind` `TypeError` |
 | `BindProblem` | type | `Literal["positional_only", "missing", "too_many", "unexpected_keyword", "multiple_values"]` |
 | `json_schema_of(annotation) -> dict` | function | JSON Schema of a type annotation |
-| `call_json_schema(name, factory, /, *, extra_properties=None, required=("name",)) -> dict` | function | JSON Schema of one `{"name", "args", "kwargs"}` call |
+| `call_json_schema(name, factory, /, *, extra_properties=None, required=("name",), label=None) -> dict` | function | JSON Schema of one `{"name", "args", "kwargs"}` call |
+| `Text` | type | `str \| Mapping[str, str]`: one text, or one per language |
+| `labelled(schema, /, *, label=None, description=None) -> dict` | function | Copy of `schema` with `x-label` / `x-description` |
+| `Label(label, description=None)` | `Annotated` marker | Adds `x-label` / `x-description` to an argument |
+| `Choices({value: label, ...})` | `Annotated` marker | Adds `enum` and `x-choices` to an argument |
 | `JSON_SCHEMA_DIALECT` | constant | `"https://json-schema.org/draft/2020-12/schema"` |
 | `located(path, /, *errors)` | context manager | Add or prefix an `at $...` note on matching errors |
 | `index_path(path, index, /) -> str` | function | `"$.a"`, `2` → `"$.a[2]"` |

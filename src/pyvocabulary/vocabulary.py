@@ -8,6 +8,7 @@ thing underneath: names mapped to entries, some of them hidden from lookups.
 from collections.abc import Callable, Iterable, Iterator, Mapping
 
 from .exceptions import NameAlreadyRegisteredError, NameDoesNotExistError
+from .labels import Text, checked_text
 from .names import InvalidNameErrorFactory, validate_name
 
 type DoesNotExistErrorFactory = Callable[[str, Iterable[str]], Exception]
@@ -55,6 +56,7 @@ class Vocabulary[F](Mapping[str, F]):
         "_hidden",
         "_invalid_name",
         "_kind",
+        "_labels",
     )
 
     def __init__(
@@ -69,6 +71,7 @@ class Vocabulary[F](Mapping[str, F]):
         self._kind = kind
         self._entries: dict[str, F] = {}
         self._hidden: set[str] = set()
+        self._labels: dict[str, Text] = {}
         self._does_not_exist = does_not_exist or (
             lambda name, available: NameDoesNotExistError(name, available, kind=kind)
         )
@@ -77,15 +80,31 @@ class Vocabulary[F](Mapping[str, F]):
         )
         self._invalid_name = invalid_name
 
-    def add(self, name: str, entry: F, /, *, hidden: bool = False) -> F:
+    def add(
+        self,
+        name: str,
+        entry: F,
+        /,
+        *,
+        hidden: bool = False,
+        label: Text | None = None,
+    ) -> F:
         """Register `entry` under `name` and return the entry.
+
+        Args:
+            name: The name used in JSON.
+            entry: What the name stands for.
+            hidden: Keep the name taken, but out of lookups and `labels`.
+            label: Shown to people instead of the name, see `labels`.
 
         Raises:
             InvalidNameError: If `name` is not a valid identifier (or the injected error).
             NameAlreadyRegisteredError: If `name` is taken, hidden or not (or the injected error).
+            TypeError: If `label` is not a valid text.
 
         """
         validate_name(name, kind=self._kind, error=self._invalid_name)
+        checked_label = None if label is None else checked_text(label, "label")
 
         if name in self._entries:
             raise self._already_registered(name)
@@ -95,7 +114,27 @@ class Vocabulary[F](Mapping[str, F]):
         if hidden:
             self._hidden.add(name)
 
+        if checked_label is not None:
+            self._labels[name] = checked_label
+
         return entry
+
+    @property
+    def labels(self) -> dict[str, Text]:
+        """The labels of visible entries that have one, by name, as a new dict.
+
+        Example:
+        ```python
+        >>> rules = Vocabulary[int]("rule")
+        >>> _ = rules.add("age__ge", 1, label={"en": "Age at least", "ar": "العمر لا يقل عن"})
+        >>> _ = rules.add("is_admin", 2)
+        >>> rules.labels
+        {'age__ge': {'en': 'Age at least', 'ar': 'العمر لا يقل عن'}}
+
+        ```
+
+        """
+        return {name: label for name, label in self._labels.items() if name in self}
 
     def is_registered(self, name: str, /) -> bool:
         """Whether `name` is taken, including hidden entries.

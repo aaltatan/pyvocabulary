@@ -27,6 +27,8 @@ from uuid import UUID
 
 from pyargprocessors import Process, annotated_metadata, input_annotation, resolved_annotations
 
+from .labels import Choices, Label, Text, labelled
+
 JSON_SCHEMA_DIALECT = "https://json-schema.org/draft/2020-12/schema"
 
 _SCALAR_SCHEMAS: dict[Any, dict[str, Any]] = {
@@ -82,7 +84,7 @@ def json_schema_of(annotation: Any) -> dict[str, Any]:
         return json_schema_of(annotation.__value__)
 
     if origin in _WRAPPER_ORIGINS:
-        return json_schema_of(_sent_annotation(annotation))
+        return _marked(json_schema_of(_sent_annotation(annotation)), annotation)
 
     if origin is Literal:
         return _enum_schema(list(get_args(annotation)))
@@ -106,6 +108,7 @@ def call_json_schema(
     *,
     extra_properties: Mapping[str, dict[str, Any]] | None = None,
     required: tuple[str, ...] = ("name",),
+    label: Text | None = None,
 ) -> dict[str, Any]:
     """Return the JSON Schema of one call: `{"name": ..., "args": [...], "kwargs": {...}}`.
 
@@ -119,6 +122,7 @@ def call_json_schema(
         extra_properties: More keys a package adds to its call shape,
             e.g. `{"inverse": {"type": "boolean"}}` for rules.
         required: The keys that must be present.
+        label: Shown for the call instead of its name, as `x-label`.
 
     Example:
     ```python
@@ -162,7 +166,7 @@ def call_json_schema(
     if factory.__doc__:
         schema["description"] = factory.__doc__.strip()
 
-    return schema
+    return labelled(schema, label=label)
 
 
 # -----------------------
@@ -233,6 +237,15 @@ def _typeddict_schema(annotation: Any) -> dict[str, Any]:
         "properties": {name: json_schema_of(typ) for name, typ in annotations.items()},
         "required": [name for name in annotations if name in annotation.__required_keys__],
     }
+
+
+def _marked(schema: dict[str, Any], annotation: Any) -> dict[str, Any]:
+    """Apply the `Label` and `Choices` markers of an `Annotated` type, in order."""
+    for marker in annotated_metadata(annotation):
+        if isinstance(marker, Label | Choices):
+            schema = marker.apply(schema)
+
+    return schema
 
 
 def _sent_annotation(annotation: Any) -> Any:
