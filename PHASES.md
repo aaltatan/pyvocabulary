@@ -29,7 +29,7 @@
 - [x] `Text` (a string or a `{language: text}` map), `labelled`, `Label` and `Choices` markers
 - [x] `call_json_schema(label=)`; `Vocabulary.add(label=)` and `Vocabulary.labels`
 - [x] 101 tests, 100% branch coverage; bumped to 0.2.0 (branch `feat/labels`, not published)
-- [ ] Publish 0.2.0; siblings then require `pyvocabulary>=0.2.0`
+- [x] Publish 0.2.0; siblings then require `pyvocabulary>=0.2.0`
 
 ## Later (only on a real need)
 - [ ] Helpers for embedding one package's JSON Schema inside another's (`$id` per embedded schema)
