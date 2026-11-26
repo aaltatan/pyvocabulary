@@ -1,5 +1,7 @@
 # pyvocabulary
 
+**Documentation: <https://aaltatan.github.io/pyvocabulary/>**
+
 The shared core of composable, JSON-definable building blocks, used by
 [pyspecification](https://github.com/aaltatan/pyspecification),
 [pyformula](https://github.com/aaltatan/pyformula),
